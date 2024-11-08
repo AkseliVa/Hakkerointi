@@ -1,0 +1,49 @@
+### No strings attached
+
+a) Otin ensiksi selvää, mikä tämä "strings"-ohjelma on. Tieto löytyi ioflood-sivulta [Using the 'strings' Command](https://ioflood.com/blog/install-strings-command-linux/#Using_the_8216strings8217_Command). Luettuani ohjeita läpi kokeilin komentoa `strings passtr`, joka palautti pitkän listan erilaisia tietoja. Tietojen seassa luki teksti "sala-hakkeri-321". Syötin salasanan passtr-ohjelmaan ja sain vastauksena "Yes! That's the password."
+
+`FLAG{Tero-d75ee66af0a68663f15539ec0f46e3b1}`
+
+b) Löysin GitHub-repon, jossa käsitellään juuri tehtävänannon kaltaista "string"-tyypin piilottamista binäärissä. [c_hide_strings](https://github.com/mafonya/c_hide_strings). Käytin repon antamaa esimerkkikoodia, jota muokkasin ChatGPT:n avulla (https://chatgpt.com/), sillä en ole koskaan koodannut C-kielellä.
+
+#### Korjattu versio:
+
+```c
+// passtr - a simple static analysis warm up exercise
+// Copyright 2024 Tero Karvinen https://TeroKarvinen.com
+
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+
+void build_password(char *buf, ...) {
+    va_list args;
+    va_start(args, buf);
+
+    char arg = va_arg(args, int);
+    buf[0] = '\0';
+    
+    while (arg) {
+        strncat(buf, &arg, 1);
+        arg = va_arg(args, int);
+    }
+
+    va_end(args);
+}
+
+int main() {
+	char password[20];
+	char actual_password[20];
+
+	build_password(actual_password, 's', 'a', 'l', 'a', '-', 'h', 'a', 'k', 'k', 'e', 'r', 'i', '-', '3', '2', '1', '\0');
+	
+	printf("What's the password?\n");
+	scanf("%19s", password);
+	
+	if (strcmp(password, actual_password) == 0) {
+		printf("Yes! That's the password. FLAG{Tero-d75ee66af0a68663f15539ec0f46e3b1}\n");
+	} else {
+		printf("Sorry, no bonus.\n");
+	}
+	return 0;
+}
